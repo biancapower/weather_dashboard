@@ -2,8 +2,53 @@
   <h1 class="text-3xl font-bold text-gray-900 mb-8">Weather Dashboard</h1>
 
   <div class="bg-white rounded-lg shadow p-6">
-    <div class="text-center">
-      <p class="text-gray-500">Weather information coming soon...</p>
-    </div>
+    <% if flash[:alert] %>
+      <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <%= form_with url: root_path, method: :get, class: "mb-6" do |f| %>
+      <div class="flex gap-2">
+        <%= f.text_field :city,
+            placeholder: "Enter city name...",
+            value: params[:city],
+            class: "flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" %>
+        <%= f.submit "Get Weather",
+            class: "px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" %>
+      </div>
+    <% end %>
+
+    <% if @weather&.dig(:main) %>
+      <div class="text-center">
+        <h2 class="text-2xl font-semibold mb-4"><%= @weather[:name] %></h2>
+        <div class="text-4xl font-bold mb-4">
+          <%= @weather[:main][:temp].round %>°C
+        </div>
+        <% if @weather[:weather]&.first %>
+          <p class="text-gray-600 capitalize">
+            <%= @weather[:weather].first[:description] %>
+          </p>
+        <% end %>
+        <div class="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
+          <div>
+            <p>Humidity: <%= @weather[:main][:humidity] %>%</p>
+            <p>Wind: <%= @weather[:wind][:speed] %> m/s</p>
+          </div>
+          <div>
+            <p>High: <%= @weather[:main][:temp_max].round %>°C</p>
+            <p>Low: <%= @weather[:main][:temp_min].round %>°C</p>
+          </div>
+        </div>
+      </div>
+    <% elsif params[:city] %>
+      <div class="text-center text-gray-500">
+        No weather data available for this location
+      </div>
+    <% else %>
+      <div class="text-center text-gray-500">
+        Enter a city name to see the weather
+      </div>
+    <% end %>
   </div>
 </div>
